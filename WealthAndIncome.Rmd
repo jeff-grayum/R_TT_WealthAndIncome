@@ -1,0 +1,110 @@
+---
+title: "Wealth and Income"
+author: "Jeff Grayum"
+date: "2/23/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading libraries/packages.
+```{r}
+library(tidyverse)
+library(tidytuesdayR)
+library(scales)
+library(ggthemes)
+```
+
+Uploading data.  A lot of files in this dataset!  Might be an opportunity to use a join() function...
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2021-02-09')
+
+home_owner <- tuesdata$home_owner
+
+income_aggregate <- tuesdata$income_aggregate
+
+student_debt <- tuesdata$student_debt
+
+retirement <- tuesdata$retirement
+
+race_wealth <- tuesdata$race_wealth
+
+income_limits <- tuesdata$income_limits
+
+income_distribution <- tuesdata$income_distribution
+
+income_mean <- tuesdata$income_mean
+
+lifetime_earn <- tuesdata$lifetime_earn
+```
+
+Let's make one graph for each dataset.
+```{r}
+
+
+#Lifetime earnings by race and gender
+lifetime_earn %>%
+  ggplot(aes(lifetime_earn, race, fill = gender)) +
+  geom_col(position = "dodge") +
+  labs(title = "Lifetime earnings by race and gender",
+       x = "Lifetime Earnings",
+       y = "Race",
+       fill = "") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman")) +
+  scale_x_continuous(labels = dollar)
+
+
+
+#Two graphs on student loan debt
+student_debt %>%
+  mutate(race = fct_reorder(race, -loan_debt_pct)) %>%
+  ggplot(aes(year, loan_debt_pct, color = race)) +
+  geom_line() +
+  expand_limits(y = 0) + 
+  scale_y_continuous(labels = percent) +
+  labs(title = "Percent of families with student loan debt",
+       x = "Year",
+       y = "Percent of families with debt",
+       color = "Race") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
+
+student_debt %>%
+  mutate(race = fct_reorder(race, -loan_debt_pct)) %>%
+  ggplot(aes(year, loan_debt, color = race)) +
+  geom_line() +
+  expand_limits(y = 0) + 
+  scale_y_continuous(labels = dollar) +
+  labs(title = "Student load debt by race",
+       x = "Year",
+       y = "Average student loan debt",
+       color = "Race") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
+  
+retirement %>%
+  mutate(race = fct_reorder(race, -retirement)) %>%
+  ggplot(aes(year, retirement, color = race)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  scale_y_continuous(labels = dollar) +
+  labs(x = "Year",
+         y = "Average family liquid retirement savings",
+         title = "Average retirement savings by race",
+       subtitle = "Normalized to 2016 US dollars",
+       color = "Race") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
+  
+
+```
+
