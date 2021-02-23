@@ -104,7 +104,29 @@ retirement %>%
   theme_fivethirtyeight() +
   theme(axis.title = element_text(),
         text = element_text(family = "Times New Roman"))
-  
+
+#A lot of these datasets include race, year, and a unique variable.  Lets write a function!
+
+plot_by_race <- function(data, column, labels = dollar) {
+  data %>%
+    mutate(race = fct_reorder(race,  -{{ column }}, last)) %>%
+    ggplot(aes(year, {{ column }}, color = race)) +
+    geom_line() +
+    expand_limits(y = 0) +
+    scale_y_continuous(labels = labels) 
+}
+
+#Let's apply our function to the student loan debt dataset, and make the same graph we made earlier.
+
+student_debt %>%
+  plot_by_race(loan_debt) +
+   labs(title = "Student load debt by race",
+       x = "Year",
+       y = "Average student loan debt",
+       color = "Race") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text(),
+        text = element_text(family = "Times New Roman"))
 
 ```
 
